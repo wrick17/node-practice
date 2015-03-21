@@ -63,16 +63,12 @@ var server = http.createServer(function (request, response) {
       var index = -1;
       var name = qs.parse(body).name;
       var newname = qs.parse(body).newname;
-      console.log(name, newname);
       for (var i = 0; i < list.length; i++) {
         if (list[i].name === name) {
-          console.log(list[i].name, name);
-          console.log(list[i].name === name);
           index = i;
         }
       };
       if (index !== -1) {
-        console.log(index);
         list.splice(index, 1, {'name': newname, 'id': index+1});
       } else {
         console.log('man not found');
