@@ -1,24 +1,62 @@
 var http = require('http');
 var url = require('url');
+var qs = require('querystring');
 
 var list = [
   {'name': 'Pratyush', 'id': '1'},
-  {'name': 'Sayan', 'id': '3'},
-  {'name': 'Abhishek', 'id': '2'},
+  {'name': 'Sayan', 'id': '2'},
+  {'name': 'Abhishek', 'id': '3'},
   {'name': 'Utsav', 'id': '4'}
 ]
 
 var server = http.createServer(function (request, response) {
+  var parsedUrl = url.parse(request.url);
 
-  console.log('in create server -> ',url.parse(request.url));
+  console.log('in create server -> ', parsedUrl.pathname);
 
-  if (url.parse(request.url).pathname == '/getList' && url.parse(request.url).method == 'GET') {
+  if (parsedUrl.pathname === '/getContacts' && request.method === 'GET') {
     // response.write(JSON.stringify(list));
-    response.write('returning');
-    response.pipe(server);
-  }
-  else {
+    response.writeHead(200, { 'Content-Type': 'application/json' });
+    console.log(list);
+    response.end();
+  } else if (parsedUrl.pathname === '/addContact' && request.method === 'POST') {
+    var body = '';
+    request.on('data', function(data) {
+      body += data;
+    });
+    request.on('end', function() {
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+      list.push({'name': qs.parse(body).name, 'id': list.length+1});
+      console.log(list);
+      response.end();
+    });
+  } else if (parsedUrl.pathname === '/deleteContact' && request.method === 'POST') {
+    var body = '';
+    request.on('data', function(data) {
+      body += data;
+    });
+    request.on('end', function() {
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+      var index = -1;
+      var name = qs.parse(body).name;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].name == qs.parse(body).name) {
+          console.log(list[i].name == name);
+          index = i;
+        }
+      };
+      if (index !== -1) {
+        list.splice(index, 1);
+      } else {
+        console.log('man not found');
+      }
+      console.log(list);
+      response.end();
+    });
+  } else {
     console.log('not found');
+    response.writeHead(404);
+    response.end();
   }
 
 });
