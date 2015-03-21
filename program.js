@@ -10,6 +10,8 @@ var list = [
 ]
 
 var server = http.createServer(function (request, response) {
+  request.setEncoding("UTF-8");
+
   var parsedUrl = url.parse(request.url);
 
   console.log('in create server -> ', parsedUrl.pathname);
@@ -18,7 +20,7 @@ var server = http.createServer(function (request, response) {
     // response.write(JSON.stringify(list));
     response.writeHead(200, { 'Content-Type': 'application/json' });
     console.log(list);
-    response.end();
+    response.end(JSON.stringify(list));
   } else if (parsedUrl.pathname === '/addContact' && request.method === 'POST') {
     var body = '';
     request.on('data', function(data) {
@@ -28,7 +30,7 @@ var server = http.createServer(function (request, response) {
       response.writeHead(200, { 'Content-Type': 'application/json' });
       list.push({'name': qs.parse(body).name, 'id': list.length+1});
       console.log(list);
-      response.end();
+      response.end(JSON.stringify(list));
     });
   } else if (parsedUrl.pathname === '/deleteContact' && request.method === 'POST') {
     var body = '';
@@ -40,8 +42,7 @@ var server = http.createServer(function (request, response) {
       var index = -1;
       var name = qs.parse(body).name;
       for (var i = 0; i < list.length; i++) {
-        if (list[i].name == qs.parse(body).name) {
-          console.log(list[i].name == name);
+        if (list[i].name === name) {
           index = i;
         }
       };
@@ -51,7 +52,7 @@ var server = http.createServer(function (request, response) {
         console.log('man not found');
       }
       console.log(list);
-      response.end();
+      response.end(JSON.stringify(list));
     });
   } else if (parsedUrl.pathname === '/editContact' && request.method === 'POST') {
     var body = '';
@@ -74,7 +75,7 @@ var server = http.createServer(function (request, response) {
         console.log('man not found');
       }
       console.log(list);
-      response.end();
+      response.end(JSON.stringify(list));
     });
   } else {
     console.log('not found');
