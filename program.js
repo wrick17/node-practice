@@ -18,7 +18,6 @@ Array.prototype.find = function (predicate) {
   }
 };
 
-// cant use regex as keys, and if defined as strings we need extra escapting
 var routes = {
   'GET /contacts$': listContacts,
   'POST /contacts$': addContact,
@@ -35,20 +34,11 @@ function listContacts(req, res) {
 
 function addContact(req, res) {
   var entry = JSON.parse(req.body);
-
-  // so why cant i use the regular methods in postman?
-  // you were sending data in a different format
-  // x-www-form-urlencoded is not the right format if your server is expecting it in JSON
-  // so you need to select Raw and then select JSON, then manually write your request body.
-  // okk so what about the first one'? dont use form-data or x-www-form-urlencoded
-  // use raw + json, okk (thumbsup)
-
   entry.id = lastId++;
 
   list.push(entry);
   console.log(list);
 
-  // always do this last
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
 }
@@ -69,8 +59,6 @@ function getContact(req, res) {
   res.end(JSON.stringify(entry));
 }
 
-// wait
-
 function editContact(req, res) {
   var id = parseInt(req.params[0]);
   var entry = JSON.parse(req.body);
@@ -78,7 +66,6 @@ function editContact(req, res) {
   list.splice(id-1, 1, {'name': entry.name, 'id': id});
   console.log(list);
 
-  // always do this last
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
 }
@@ -89,12 +76,9 @@ function removeContact(req, res) {
   list.splice(id-1, 1);
   console.log(list);
 
-  // always do this last
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
 }
-
-// now go
 
 var server = http.createServer(function (req, res) {
   var parsedUrl = url.parse(req.url),
@@ -125,13 +109,6 @@ var server = http.createServer(function (req, res) {
     return;
   }
 
-  // console.log('Handler was:', handler);
-
-  // silly mistake :), was calling the handler only if its POST or PATCH. ouu
-// man now tell me what u did
-// i lost u in the middle
-// calling u
-// ok
   req.on('data', function(data) {
     body += data;
   });
@@ -143,78 +120,6 @@ var server = http.createServer(function (req, res) {
   });
 
   return;
-
-  // move this into specific methods above
-  // we dont need to verify the routes inside those methods again
-  // just need the logic of constructing res
-  // okk, let me try 2
-  // remove code below - wait, first move the logic for edit and delete, okk
-  //  first lets see if the above work.s? sure
-  // good chance it may not :P :D wait go ahed
-
-  if (parsedUrlPath[1] === 'contacts' && parsedUrlPath.length < 3 && req.method === 'GET') {
-    // res.write(JSON.stringify(list));
-
-  } else if (parsedUrlPath[1] === 'contacts' && parsedUrlPath.length < 3 && req.method === 'POST') {
-    var body = '';
-    req.on('data', function(data) {
-      body += data;
-    });
-    req.on('end', function() {
-
-    });
-  } else if (parsedUrlPath[1] === 'contacts' && parsedUrlPath.length === 3 && req.method === 'DELETE') {
-    var body = '';
-    req.on('data', function(data) {
-      body += data;
-    });
-    req.on('end', function() {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      var index = -1;
-      var name = parsedUrlPath[2];
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].name === name) {
-          index = i;
-        }
-      };
-      if (index !== -1) {
-        list.splice(index, 1);
-      } else {
-        console.log('man not found');
-      }
-      console.log(list);
-      res.end(JSON.stringify(list));
-    });
-  } else if (parsedUrlPath[1] === 'contacts' && parsedUrlPath.length === 3 && req.method === 'PATCH') {
-    var body = '';
-    req.on('data', function(data) {
-      body += data;
-    });
-    req.on('end', function() {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      var index = -1;
-      var name = parsedUrlPath[2];
-      var newname = qs.parse(body).newname;
-      var newroll = qs.parse(body).roll;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].name === name) {
-          index = i;
-        }
-      };
-      if (index !== -1) {
-        list.splice(index, 1, {'name': newname, 'roll': newroll});
-      } else {
-        console.log('man not found');
-      }
-      console.log(list);
-      res.end(JSON.stringify(list));
-    });
-  } else {
-    console.log('not found');
-    res.writeHead(404);
-    res.end();
-  }
-
 });
 
 server.on('connection', function (stream) {
