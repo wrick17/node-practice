@@ -3,10 +3,10 @@ var url = require('url');
 var qs = require('querystring');
 
 var list = [
-  {'name': 'Pratyush', 'id': '1'},
-  {'name': 'Sayan', 'id': '2'},
-  {'name': 'Abhishek', 'id': '3'},
-  {'name': 'Utsav', 'id': '4'}
+  {'name': 'Pratyush', 'roll': '12'},
+  {'name': 'Sayan', 'roll': '34'},
+  {'name': 'Abhishek', 'roll': '38'},
+  {'name': 'Utsav', 'roll': '43'}
 ]
 
 var server = http.createServer(function (request, response) {
@@ -28,7 +28,7 @@ var server = http.createServer(function (request, response) {
     });
     request.on('end', function() {
       response.writeHead(200, { 'Content-Type': 'application/json' });
-      list.push({'name': qs.parse(body).name, 'id': list.length+1});
+      list.push({'name': qs.parse(body).name, 'roll': qs.parse(body).roll});
       console.log(list);
       response.end(JSON.stringify(list));
     });
@@ -70,7 +70,7 @@ var server = http.createServer(function (request, response) {
         }
       };
       if (index !== -1) {
-        list.splice(index, 1, {'name': newname, 'id': index+1});
+        list.splice(index, 1, {'name': newname, 'roll': qs.parse(body).roll});
       } else {
         console.log('man not found');
       }
