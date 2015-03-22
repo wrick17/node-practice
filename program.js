@@ -1,14 +1,13 @@
-var http = require('http');
-var url = require('url');
-var qs = require('querystring');
-
-var lastId = 5;
-var list = [
-  {name: 'Pratyush', id: 1},
-  {name: 'Sayan', id: 2},
-  {name: 'Abhishek', id: 3},
-  {name: 'Utsav', id: 4}
-];
+var http = require('http'),
+    url = require('url'),
+    qs = require('querystring'),
+    lastId = 5,
+    list = [
+      {name: 'Pratyush', id: 1},
+      {name: 'Sayan', id: 2},
+      {name: 'Abhishek', id: 3},
+      {name: 'Utsav', id: 4}
+    ];
 
 Array.prototype.find = function (predicate) {
   for (var item in this) {
@@ -27,7 +26,7 @@ var routes = {
 };
 
 function listContacts(req, res) {
-  console.log(list);
+  // console.log(list);
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
 }
@@ -37,7 +36,7 @@ function addContact(req, res) {
   entry.id = lastId++;
 
   list.push(entry);
-  console.log(list);
+  // console.log(list);
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
@@ -63,8 +62,10 @@ function editContact(req, res) {
   var id = parseInt(req.params[0]);
   var entry = JSON.parse(req.body);
 
-  list.splice(id-1, 1, {'name': entry.name, 'id': id});
-  console.log(list);
+  list.splice(list.find(function (contact) {
+        return contact.id === id;
+      }).id-1, 1, {'name': entry.name, 'id': id});
+  // console.log(list);
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
@@ -73,8 +74,14 @@ function editContact(req, res) {
 function removeContact(req, res) {
   var id = parseInt(req.params[0]);
 
-  list.splice(id-1, 1);
-  console.log(list);
+  // console.log(list.find(function (contact) {
+  //       return contact.id === id;
+  //     }).id-1);
+
+  list.splice(list.find(function (contact) {
+        return contact.id === id;
+      }).id-1, 1);
+  // console.log(list);
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(list));
@@ -93,7 +100,7 @@ var server = http.createServer(function (req, res) {
     routeRex = new RegExp(routePat),
     match = routeRex.exec(methodAndPath);
 
-    console.log('Matching with:', routePat, 'result - ', !!match);
+    // console.log('Matching with:', routePat, 'result - ', !!match);
 
     if (!match) continue;
 
