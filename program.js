@@ -36,6 +36,13 @@ function listContacts(req, res) {
 function addContact(req, res) {
   var entry = JSON.parse(req.body);
 
+  // so why cant i use the regular methods in postman?
+  // you were sending data in a different format
+  // x-www-form-urlencoded is not the right format if your server is expecting it in JSON
+  // so you need to select Raw and then select JSON, then manually write your request body.
+  // okk so what about the first one'? dont use form-data or x-www-form-urlencoded
+  // use raw + json, okk (thumbsup)
+
   entry.id = lastId++;
 
   list.push(entry);
@@ -65,11 +72,26 @@ function getContact(req, res) {
 // wait
 
 function editContact(req, res) {
-// implement this
+  var id = parseInt(req.params[0]);
+  var entry = JSON.parse(req.body);
+
+  list.splice(id-1, 1, {'name': entry.name, 'id': id});
+  console.log(list);
+
+  // always do this last
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(list));
 }
 
 function removeContact(req, res) {
-// implement this
+  var id = parseInt(req.params[0]);
+
+  list.splice(id-1, 1);
+  console.log(list);
+
+  // always do this last
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(list));
 }
 
 // now go
@@ -103,7 +125,7 @@ var server = http.createServer(function (req, res) {
     return;
   }
 
-  console.log('Handler was:', handler);
+  // console.log('Handler was:', handler);
 
   // silly mistake :), was calling the handler only if its POST or PATCH. ouu
 // man now tell me what u did
